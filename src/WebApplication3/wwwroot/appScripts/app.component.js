@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require("@angular/core");
 var AppComponent = (function () {
     function AppComponent() {
-        this.pageTitle = "My First Angular 2 App";
+        this.pageTitle = "My First Angular 2 App new branch test";
     }
     AppComponent = __decorate([
         core_1.Component({
