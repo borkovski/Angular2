@@ -9,7 +9,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var product_list_component_1 = require("./products/product-list.component");
 var AppComponent = (function () {
     function AppComponent() {
         this.pageTitle = "My First Angular 2";
@@ -17,8 +16,7 @@ var AppComponent = (function () {
     AppComponent = __decorate([
         core_1.Component({
             selector: "my-app",
-            templateUrl: "views/app.component.html",
-            directives: [product_list_component_1.ProductListComponent]
+            templateUrl: "views/app.component.html"
         }), 
         __metadata('design:paramtypes', [])
     ], AppComponent);
