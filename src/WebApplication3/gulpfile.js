@@ -36,7 +36,7 @@ var tsProject = ts.createProject('scripts/tsconfig.json');
 gulp.task('ts', function (done) {
     //var tsResult = tsProject.src()
     var tsResult = gulp.src([
-            "scripts/*.ts"
+            "scripts/**/*.ts"
     ])
         .pipe(ts(tsProject), undefined, ts.reporter.fullReporter());
     return tsResult.js.pipe(gulp.dest('./wwwroot/appScripts'));
@@ -45,7 +45,7 @@ gulp.task('ts', function (done) {
 gulp.task('watch', ['watch.ts']);
 
 gulp.task('watch.ts', ['ts'], function () {
-    return gulp.watch('scripts/*.ts', ['ts']);
+    return gulp.watch('scripts/**/*.ts', ['ts']);
 });
 
 gulp.task('default', ['scriptsNStyles', 'watch']);
