@@ -22,14 +22,12 @@ gulp.task("scriptsNStyles", () => {
             '@angular/**',
             'jquery/dist/jquery.*js',
             'bootstrap/dist/js/bootstrap.*js',
+            'bootstrap/dist/fonts/**',
+            'bootstrap/dist/css/*.css',
     ], {
         cwd: "node_modules/**"
     })
         .pipe(gulp.dest("./wwwroot/libs"));
-
-    gulp.src([
-        'node_modules/bootstrap/dist/css/bootstrap.css'
-    ]).pipe(gulp.dest('./wwwroot/libs/css'));
 });
 
 var tsProject = ts.createProject('scripts/tsconfig.json');
