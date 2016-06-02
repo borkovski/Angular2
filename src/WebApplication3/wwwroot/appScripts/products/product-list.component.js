@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var router_deprecated_1 = require("@angular/router-deprecated");
 var product_filter_pipe_1 = require('./product-filter.pipe');
 var star_component_1 = require('../shared/star.component');
 var product_service_1 = require('./product.service');
@@ -19,7 +20,7 @@ var ProductListComponent = (function () {
         this.imageWidth = 50;
         this.imageMargin = 2;
         this.showImage = false;
-        this.listFilter = 'cart';
+        this.listFilter = '';
     }
     ProductListComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -35,11 +36,10 @@ var ProductListComponent = (function () {
     };
     ProductListComponent = __decorate([
         core_1.Component({
-            selector: 'pm-products',
             templateUrl: 'views/products/product-list.component.html',
             styleUrls: ['css/products/product-list.component.css'],
             pipes: [product_filter_pipe_1.ProductFilterPipe],
-            directives: [star_component_1.StarComponent]
+            directives: [star_component_1.StarComponent, router_deprecated_1.ROUTER_DIRECTIVES]
         }), 
         __metadata('design:paramtypes', [product_service_1.ProductService])
     ], ProductListComponent);

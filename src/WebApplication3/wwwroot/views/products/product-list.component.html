@@ -37,7 +37,11 @@
                                  [title]="product.productName | uppercase"
                                  [style.width.px]="imageWidth"
                                  [style.margin.px]="imageMargin" /></td>
-                        <td>{{product.productName | uppercase}}</td>
+                        <td>
+                            <a [routerLink]="['ProductDetail', {id: product.productId }]">
+                                {{product.productName | uppercase}}
+                            </a>
+                        </td>
                         <td>{{product.productCode}}</td>
                         <td>{{product.releaseDate}}</td>
                         <td>{{product.price | currency:'USD':false:'1.2-2'}}</td>
