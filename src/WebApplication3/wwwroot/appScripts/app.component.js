@@ -10,6 +10,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require("@angular/core");
 var product_list_component_1 = require("./products/product-list.component");
+var product_service_1 = require('./products/product.service');
 var AppComponent = (function () {
     function AppComponent() {
         this.pageTitle = "My First Angular 2";
@@ -18,7 +19,8 @@ var AppComponent = (function () {
         core_1.Component({
             selector: "my-app",
             templateUrl: "views/app.component.html",
-            directives: [product_list_component_1.ProductListComponent]
+            directives: [product_list_component_1.ProductListComponent],
+            providers: [product_service_1.ProductService]
         }), 
         __metadata('design:paramtypes', [])
     ], AppComponent);

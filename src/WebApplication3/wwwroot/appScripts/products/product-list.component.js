@@ -11,67 +11,19 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var core_1 = require('@angular/core');
 var product_filter_pipe_1 = require('./product-filter.pipe');
 var star_component_1 = require('../shared/star.component');
+var product_service_1 = require('./product.service');
 var ProductListComponent = (function () {
-    function ProductListComponent() {
+    function ProductListComponent(_productService) {
+        this._productService = _productService;
         this.pageTitle = "Product list interpolated!";
         this.imageWidth = 50;
         this.imageMargin = 2;
-        this.products = [
-            {
-                "productId": 1,
-                "productName": "Leaf Rake",
-                "productCode": "GDN-0011",
-                "releaseDate": "March 19, 2016",
-                "description": "Leaf rake with 48-inch wooden handle.",
-                "price": 19.95,
-                "starRating": 3.2,
-                "imageUrl": "http://openclipart.org/image/300px/svg_to_png/26215/Anonymous_Leaf_Rake.png"
-            },
-            {
-                "productId": 2,
-                "productName": "Garden Cart",
-                "productCode": "GDN-0023",
-                "releaseDate": "March 18, 2016",
-                "description": "15 gallon capacity rolling garden cart",
-                "price": 32.99,
-                "starRating": 4.2,
-                "imageUrl": "http://openclipart.org/image/300px/svg_to_png/58471/garden_cart.png"
-            },
-            {
-                "productId": 5,
-                "productName": "Hammer",
-                "productCode": "TBX-0048",
-                "releaseDate": "May 21, 2016",
-                "description": "Curved claw steel hammer",
-                "price": 8.9,
-                "starRating": 4.8,
-                "imageUrl": "http://openclipart.org/image/300px/svg_to_png/73/rejon_Hammer.png"
-            },
-            {
-                "productId": 8,
-                "productName": "Saw",
-                "productCode": "TBX-0022",
-                "releaseDate": "May 15, 2016",
-                "description": "15-inch steel blade hand saw",
-                "price": 11.55,
-                "starRating": 3.7,
-                "imageUrl": "http://openclipart.org/image/300px/svg_to_png/27070/egore911_saw.png"
-            },
-            {
-                "productId": 10,
-                "productName": "Video Game Controller",
-                "productCode": "GMG-0042",
-                "releaseDate": "October 15, 2015",
-                "description": "Standard two-button video game controller",
-                "price": 35.95,
-                "starRating": 4.6,
-                "imageUrl": "http://openclipart.org/image/300px/svg_to_png/120337/xbox-controller_01.png"
-            }
-        ];
+        this.products = null;
         this.showImage = false;
         this.listFilter = 'cart';
     }
     ProductListComponent.prototype.ngOnInit = function () {
+        this.products = this._productService.getProducts();
         console.log('In OnInit');
     };
     ProductListComponent.prototype.toggleImage = function () {
@@ -88,7 +40,7 @@ var ProductListComponent = (function () {
             pipes: [product_filter_pipe_1.ProductFilterPipe],
             directives: [star_component_1.StarComponent]
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [product_service_1.ProductService])
     ], ProductListComponent);
     return ProductListComponent;
 }());
