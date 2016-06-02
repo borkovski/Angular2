@@ -12,6 +12,8 @@ var core_1 = require('@angular/core');
 var ProductListComponent = (function () {
     function ProductListComponent() {
         this.pageTitle = "Product list interpolated!";
+        this.imageWidth = 50;
+        this.imageMargin = 2;
         this.products = [
             {
                 "productId": 1,
@@ -64,7 +66,12 @@ var ProductListComponent = (function () {
                 "imageUrl": "http://openclipart.org/image/300px/svg_to_png/120337/xbox-controller_01.png"
             }
         ];
+        this.showImage = false;
+        this.listFilter = 'cart';
     }
+    ProductListComponent.prototype.toggleImage = function () {
+        this.showImage = !this.showImage;
+    };
     ProductListComponent = __decorate([
         core_1.Component({
             selector: 'pm-products',
