@@ -9,6 +9,8 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var http_1 = require("@angular/http");
+require('rxjs/add/operator/map');
 var product_list_component_1 = require("./products/product-list.component");
 var product_service_1 = require('./products/product.service');
 var AppComponent = (function () {
@@ -20,7 +22,7 @@ var AppComponent = (function () {
             selector: "my-app",
             templateUrl: "views/app.component.html",
             directives: [product_list_component_1.ProductListComponent],
-            providers: [product_service_1.ProductService]
+            providers: [product_service_1.ProductService, http_1.HTTP_PROVIDERS]
         }), 
         __metadata('design:paramtypes', [])
     ], AppComponent);

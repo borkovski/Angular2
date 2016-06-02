@@ -18,12 +18,13 @@ var ProductListComponent = (function () {
         this.pageTitle = "Product list interpolated!";
         this.imageWidth = 50;
         this.imageMargin = 2;
-        this.products = null;
         this.showImage = false;
         this.listFilter = 'cart';
     }
     ProductListComponent.prototype.ngOnInit = function () {
-        this.products = this._productService.getProducts();
+        var _this = this;
+        this._productService.getProducts()
+            .subscribe(function (products) { return _this.products = products; }, function (error) { return _this.errorMessage = error; });
         console.log('In OnInit');
     };
     ProductListComponent.prototype.toggleImage = function () {
