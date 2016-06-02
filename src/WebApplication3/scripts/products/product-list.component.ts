@@ -2,12 +2,14 @@
 
 import { IProduct } from './product'
 import { ProductFilterPipe } from './product-filter.pipe'
+import { StarComponent } from '../shared/star.component'
 
 @Component({
     selector: 'pm-products',
     templateUrl: 'views/products/product-list.component.html',
     styleUrls: ['css/products/product-list.component.css'],
-    pipes: [ ProductFilterPipe ]
+    pipes: [ProductFilterPipe],
+    directives: [StarComponent]
 })
 export class ProductListComponent implements OnInit {
     pageTitle: string = "Product list interpolated!";
@@ -74,5 +76,9 @@ export class ProductListComponent implements OnInit {
 
     toggleImage(): void {
         this.showImage = !this.showImage;
+    }
+
+    onRatingClicked(message: string) {
+        this.pageTitle = 'Product List: ' + message;
     }
 }
