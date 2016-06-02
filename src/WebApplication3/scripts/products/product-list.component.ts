@@ -1,14 +1,19 @@
-﻿import { Component } from '@angular/core'
+﻿import { Component, OnInit } from '@angular/core'
+
+import { IProduct } from './product'
+import { ProductFilterPipe } from './product-filter.pipe'
 
 @Component({
     selector: 'pm-products',
-    templateUrl: 'views/products/product-list.component.html'
+    templateUrl: 'views/products/product-list.component.html',
+    styleUrls: ['css/products/product-list.component.css'],
+    pipes: [ ProductFilterPipe ]
 })
-export class ProductListComponent {
+export class ProductListComponent implements OnInit {
     pageTitle: string = "Product list interpolated!";
     imageWidth: number = 50;
     imageMargin: number = 2;
-    products: any[] = [
+    products: IProduct[] = [
         {
             "productId": 1,
             "productName": "Leaf Rake",
@@ -62,6 +67,10 @@ export class ProductListComponent {
     ];
     showImage: boolean = false;
     listFilter: string = 'cart';
+
+    ngOnInit(): void {
+        console.log('In OnInit');
+    }
 
     toggleImage(): void {
         this.showImage = !this.showImage;

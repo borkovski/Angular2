@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require('@angular/core');
+var product_filter_pipe_1 = require('./product-filter.pipe');
 var ProductListComponent = (function () {
     function ProductListComponent() {
         this.pageTitle = "Product list interpolated!";
@@ -69,13 +70,18 @@ var ProductListComponent = (function () {
         this.showImage = false;
         this.listFilter = 'cart';
     }
+    ProductListComponent.prototype.ngOnInit = function () {
+        console.log('In OnInit');
+    };
     ProductListComponent.prototype.toggleImage = function () {
         this.showImage = !this.showImage;
     };
     ProductListComponent = __decorate([
         core_1.Component({
             selector: 'pm-products',
-            templateUrl: 'views/products/product-list.component.html'
+            templateUrl: 'views/products/product-list.component.html',
+            styleUrls: ['css/products/product-list.component.css'],
+            pipes: [product_filter_pipe_1.ProductFilterPipe]
         }), 
         __metadata('design:paramtypes', [])
     ], ProductListComponent);
