@@ -1,33 +1,50 @@
-﻿import {Component, AfterViewInit, ContentChild} from "@angular/core";
+﻿import {Component, AfterViewInit} from "@angular/core";
+import {IPosition, Position} from './position';
+import {WalkerService} from './walker.service';
 @Component({
     selector: "my-app",
-    templateUrl: "views/app.component.html"
+    templateUrl: "views/app.component.html",
+    providers: [WalkerService]
 })
 export class AppComponent implements AfterViewInit {
     context: CanvasRenderingContext2D;
     myCanvas: HTMLCanvasElement;
-    pixelData: ImageData;
     canvasWidth: number;
     canvasHeight: number;
+    isDrawing: boolean = true;
+
+    constructor(private walkerService: WalkerService) {
+    }
 
     ngAfterViewInit() {
         this.myCanvas = document.getElementById("myCanvas") as HTMLCanvasElement;
         this.context = this.myCanvas.getContext("2d");
         this.canvasHeight = this.myCanvas.height;
         this.canvasWidth = this.myCanvas.width;
-
-        this.pixelData = this.context.createImageData(this.canvasWidth, this.canvasHeight);
+        this.reset();
         this.tick();
     }
 
     tick() {
-        requestAnimationFrame(() => {
-            this.tick()
-        });
+        if (this.isDrawing) {
+            requestAnimationFrame(() => {
+                this.tick()
+            });
+        }
+        this.context.fillStyle = this.walkerService.getNewColor().toHex();
+        var newPos = this.walkerService.getNewPosition();
+        this.context.fillRect(newPos.x*10, newPos.y*10, 10, 10);
+    }
 
-        var ctx = this.context;
-        ctx.clearRect(0, 0, 400, 400);
-        ctx.fillStyle = 'red';
-        ctx.fillRect(0, 0, 111, 222);
+    toggleDrawing() {
+        this.isDrawing = !this.isDrawing;
+        if (this.isDrawing) {
+            this.tick();
+        }
+    }
+
+    reset() {
+        this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+        this.walkerService.set(this.canvasWidth / 20, this.canvasHeight / 20);
     }
 }
