@@ -1,10 +1,12 @@
 ﻿import {Component, AfterViewInit} from "@angular/core";
 import {IPosition, Position} from './position';
 import {WalkerService} from './walker.service';
+import {RandomService} from './random.service';
+
 @Component({
     selector: "my-app",
     templateUrl: "views/app.component.html",
-    providers: [WalkerService]
+    providers: [WalkerService, RandomService]
 })
 export class AppComponent implements AfterViewInit {
     context: CanvasRenderingContext2D;
@@ -13,7 +15,7 @@ export class AppComponent implements AfterViewInit {
     canvasHeight: number;
     isDrawing: boolean = true;
 
-    constructor(private walkerService: WalkerService) {
+    constructor(private walkerService: WalkerService, private randomService: RandomService) {
     }
 
     ngAfterViewInit() {
@@ -33,7 +35,10 @@ export class AppComponent implements AfterViewInit {
         }
         this.context.fillStyle = this.walkerService.getNewColor().toHex();
         var newPos = this.walkerService.getNewPosition();
-        this.context.fillRect(newPos.x*10, newPos.y*10, 10, 10);
+        this.context.fillRect(newPos.x * 10, newPos.y * 10, 10, 10);
+        var pixelData = this.context.createImageData(100, 60);
+        this.randomService.fillImageData(pixelData);
+        this.context.putImageData(pixelData, 0, 0);
     }
 
     toggleDrawing() {

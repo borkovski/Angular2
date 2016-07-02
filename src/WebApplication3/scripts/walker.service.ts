@@ -1,10 +1,14 @@
 ﻿import {Injectable} from '@angular/core';
 import {IPosition, Position} from './position';
 import {IColor, Color} from './color';
+import {RandomService} from './random.service';
 
 @Injectable()
 export class WalkerService {
     currentPosition: IPosition;
+
+    constructor(private randomService: RandomService) {
+    }
 
     getNewPosition(): IPosition {
         var rnd = this.getRandom(0, 4);
@@ -39,6 +43,6 @@ export class WalkerService {
     }
 
     private getRandom(min, max) {
-        return Math.floor(Math.random() * (max - min)) + min;
+        return Math.floor(this.randomService.getRandom() * (max - min)) + min;
     }
 }
