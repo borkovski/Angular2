@@ -35,7 +35,8 @@ export class WalkerService {
         var r = this.getRandom(0, 255);
         var g = this.getRandom(0, 255);
         var b = this.getRandom(0, 255);
-        return new Color(r, g, b);
+        var a = this.getRandom(0, 1);
+        return new Color(r, g, b, a);
     }
 
     set(x, y): void {
@@ -45,4 +46,5 @@ export class WalkerService {
     private getRandom(min, max) {
         return Math.floor(this.randomService.getRandom() * (max - min)) + min;
     }
+
 }

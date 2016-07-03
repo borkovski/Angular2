@@ -9,6 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
+var color_1 = require('./color');
 var walker_service_1 = require('./walker.service');
 var random_service_1 = require('./random.service');
 var AppComponent = (function () {
@@ -22,6 +23,8 @@ var AppComponent = (function () {
         this.context = this.myCanvas.getContext("2d");
         this.canvasHeight = this.myCanvas.height;
         this.canvasWidth = this.myCanvas.width;
+        this.xGaussian = this.randomService.getGaussian(this.canvasWidth / 2, this.canvasWidth / 8);
+        this.yGaussian = this.randomService.getGaussian(this.canvasHeight / 2, this.canvasHeight / 8);
         this.reset();
         this.tick();
     };
@@ -32,12 +35,25 @@ var AppComponent = (function () {
                 _this.tick();
             });
         }
-        this.context.fillStyle = this.walkerService.getNewColor().toHex();
-        var newPos = this.walkerService.getNewPosition();
-        this.context.fillRect(newPos.x * 10, newPos.y * 10, 10, 10);
-        var pixelData = this.context.createImageData(100, 60);
-        this.randomService.fillImageData(pixelData);
-        this.context.putImageData(pixelData, 0, 0);
+        var x = this.xGaussian();
+        var y = this.yGaussian();
+        this.context.save();
+        this.context.beginPath();
+        this.context.arc(x, y, 10, 0, 2 * Math.PI);
+        this.context.closePath();
+        var r = this.randomService.getRandom() * 255;
+        var g = this.randomService.getRandom() * 255;
+        var b = this.randomService.getRandom() * 255;
+        var a = this.randomService.getRandom() / 2;
+        var color = new color_1.Color(r, g, b, a);
+        this.context.fillStyle = color.toRGBA();
+        this.context.fill();
+        this.context.restore();
+        //var newPos = this.walkerService.getNewPosition();
+        //this.context.fillRect(newPos.x * 10, newPos.y * 10, 10, 10);
+        //var pixelData = this.context.createImageData(16, 100);
+        //this.randomService.fillImageData(pixelData);
+        //this.context.putImageData(pixelData, 0, 0);
     };
     AppComponent.prototype.toggleDrawing = function () {
         this.isDrawing = !this.isDrawing;

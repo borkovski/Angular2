@@ -10,6 +10,35 @@ export class RandomService {
         return rnd;
     }
 
+    getGaussian(mean, stdev) {
+        var y2;
+        var use_last = false;
+        return function () {
+            var y1;
+            if (use_last) {
+                y1 = y2;
+                use_last = false;
+            }
+            else {
+                var x1, x2, w;
+                do {
+                    x1 = 2.0 * Math.random() - 1.0;
+                    x2 = 2.0 * Math.random() - 1.0;
+                    w = x1 * x1 + x2 * x2;
+                } while (w >= 1.0);
+                w = Math.sqrt((-2.0 * Math.log(w)) / w);
+                y1 = x1 * w;
+                y2 = x2 * w;
+                use_last = true;
+            }
+
+            var retval = mean + stdev * y1;
+            if (retval > 0)
+                return retval;
+            return -retval;
+        }
+    }
+
     getValues() {
         return this.values;
     }
@@ -17,8 +46,8 @@ export class RandomService {
     fillImageData(pixelData: ImageData): ImageData {
         var first: number = 0, second: number = 0, third: number = 0, forth: number = 0;
         var max = 0;
-        var start = this.values.length - 100 < 0 ? 0 : this.values.length - 100;
-        for (var i in this.values.slice(start, this.values.length)) {
+        var stopCondition = this.values.length - 100 < 0 ? 0 : this.values.length - 100;
+        for (var i = this.values.length - 1; i > stopCondition; i--) {
             var val = this.values[i];
             if (val < .25) {
                 first++;
