@@ -3,11 +3,12 @@ import {IPosition, Position} from './position';
 import {IColor, Color} from './color';
 import {WalkerService} from './walker.service';
 import {RandomService} from './random.service';
+import {NoiseService} from './noise.service';
 
 @Component({
     selector: "my-app",
     templateUrl: "views/app.component.html",
-    providers: [WalkerService, RandomService]
+    providers: [WalkerService, RandomService, NoiseService]
 })
 export class AppComponent implements AfterViewInit {
     context: CanvasRenderingContext2D;
@@ -15,10 +16,12 @@ export class AppComponent implements AfterViewInit {
     canvasWidth: number;
     canvasHeight: number;
     isDrawing: boolean = true;
-    xGaussian;
-    yGaussian;
+    time = 0;
+    zoom = 25;
+    renderResolution = 25;
+    speed = 25;
 
-    constructor(private walkerService: WalkerService, private randomService: RandomService) {
+    constructor(private walkerService: WalkerService, private randomService: RandomService, private noiseService: NoiseService) {
     }
 
     ngAfterViewInit() {
@@ -26,8 +29,6 @@ export class AppComponent implements AfterViewInit {
         this.context = this.myCanvas.getContext("2d");
         this.canvasHeight = this.myCanvas.height;
         this.canvasWidth = this.myCanvas.width;
-        this.xGaussian = this.randomService.getGaussian(this.canvasWidth / 2, this.canvasWidth / 8);
-        this.yGaussian = this.randomService.getGaussian(this.canvasHeight / 2, this.canvasHeight / 8);
         this.reset();
         this.tick();
     }
@@ -38,26 +39,29 @@ export class AppComponent implements AfterViewInit {
                 this.tick()
             });
         }
-        var x = this.xGaussian();
-        var y = this.yGaussian();
-        this.context.save();
-        this.context.beginPath();
-        this.context.arc(x, y, 10, 0, 2 * Math.PI);
-        this.context.closePath(); 
+        this.reset();
+        var currentRenderResolution = this.renderResolution;
+        for (var i = 0; i < this.canvasWidth; i += currentRenderResolution) {
+            for (var j = 0; j < this.canvasHeight; j += currentRenderResolution) {
+                var noise = this.noiseService.getPerlin(i * this.zoom / this.canvasHeight, j * this.zoom / this.canvasWidth, this.time);
+                var color = new Color(noise * 512, noise * 256, 0, 1);
+                this.context.fillStyle = color.toRGBA();
+                this.context.fillRect(i, j, currentRenderResolution, currentRenderResolution);
+            }
+        }
+        this.time += this.speed/100;
+    }
 
-        var r = this.randomService.getRandom()*255;
-        var g = this.randomService.getRandom()*255;
-        var b = this.randomService.getRandom()*255;
-        var a = this.randomService.getRandom()/2;
-        var color = new Color(r, g, b, a);
-        this.context.fillStyle = color.toRGBA();
-        this.context.fill();
-        this.context.restore();
-        //var newPos = this.walkerService.getNewPosition();
-        //this.context.fillRect(newPos.x * 10, newPos.y * 10, 10, 10);
-        //var pixelData = this.context.createImageData(16, 100);
-        //this.randomService.fillImageData(pixelData);
-        //this.context.putImageData(pixelData, 0, 0);
+    changeZoom(value) {
+        this.zoom = +value;
+    }
+
+    changeResolution(value) {
+        this.renderResolution = +value;
+    }
+
+    changeSpeed(value) {
+        this.speed = +value;
     }
 
     toggleDrawing() {
@@ -67,8 +71,13 @@ export class AppComponent implements AfterViewInit {
         }
     }
 
-    reset() {
+    reset(withRanges = false) {
         this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
         this.walkerService.set(this.canvasWidth / 20, this.canvasHeight / 20);
+        if (withRanges) {
+            this.zoom = 25;
+            this.renderResolution = 25;
+            this.speed = 25;
+        }
     }
 }

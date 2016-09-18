@@ -1,7 +1,10 @@
 ﻿<div style="padding: 40px;">
-    <canvas id="myCanvas" width="1200" height="600" style="border:1px solid #ddd"></canvas>
-</div>
-<div>
-    <button id="btnToggle" (click)="toggleDrawing()">Start / Stop</button>
-    <button id="btnReset" (click)="reset()">Reset</button>
+    <canvas id="myCanvas" width="512" height="512" style="border:1px solid #ddd">TEST</canvas>
+    <div style="width: 512px">
+        <div>Zoom: <input type="range" id="inZoom" min="1" max="50" step="1" [ngModel]="zoom" (ngModelChange)="changeZoom($event)" /></div>
+        <div>Resolution: <input type="range" id="inResolution" min="1" max="50" step="1" [ngModel]="renderResolution" (ngModelChange)="changeResolution($event)" /></div>
+        <div>Speed: <input type="range" id="inSpeed" min="1" max="50" step="1" [ngModel]="speed" (ngModelChange)="changeSpeed($event)" /></div>
+        <button id="btnToggle" (click)="toggleDrawing()">Start / Stop</button>
+        <button id="btnReset" (click)="reset(true)">Reset</button>
+    </div>
 </div>
