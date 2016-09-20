@@ -1,16 +1,16 @@
 ﻿import {Injectable} from '@angular/core';
-import {IPosition, Position} from './position';
+import {ICoordinates, Vector2d} from './position';
 import {IColor, Color} from './color';
 import {RandomService} from './random.service';
 
 @Injectable()
 export class WalkerService {
-    currentPosition: IPosition;
+    currentPosition: ICoordinates;
 
     constructor(private randomService: RandomService) {
     }
 
-    getNewPosition(): IPosition {
+    getNewPosition(): ICoordinates {
         var rnd = this.getRandom(0, 4);
         switch (rnd) {
             case 0:
@@ -28,7 +28,7 @@ export class WalkerService {
             default:
                 throw Error("Incorrect random value");
         }
-        return new Position(this.currentPosition.x, this.currentPosition.y);
+        return new Vector2d(this.currentPosition.x, this.currentPosition.y);
     }
 
     getNewColor(): IColor {
@@ -40,7 +40,7 @@ export class WalkerService {
     }
 
     set(x, y): void {
-        this.currentPosition = new Position(x, y);
+        this.currentPosition = new Vector2d(x, y);
     }
 
     private getRandom(min, max) {

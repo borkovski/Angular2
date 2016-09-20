@@ -9,27 +9,25 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var color_1 = require('./color');
-var walker_service_1 = require('./walker.service');
-var random_service_1 = require('./random.service');
-var noise_service_1 = require('./noise.service');
+var position_1 = require('./position');
+var naturalObject_1 = require('./naturalObject');
 var AppComponent = (function () {
-    function AppComponent(walkerService, randomService, noiseService) {
-        this.walkerService = walkerService;
-        this.randomService = randomService;
-        this.noiseService = noiseService;
+    function AppComponent() {
         this.isDrawing = true;
-        this.time = 0;
-        this.zoom = 25;
-        this.renderResolution = 25;
-        this.speed = 25;
+        this.wind = new position_1.Vector2d(0.02, 0);
+        this.gravity = new position_1.Vector2d(0, 1);
+        this.airFriction = .01;
+        this.waterFriction = .1;
+        this.groundFriction = .1;
+        this.restitution = .8;
+        this.hasWater = false;
     }
     AppComponent.prototype.ngAfterViewInit = function () {
         this.myCanvas = document.getElementById("myCanvas");
         this.context = this.myCanvas.getContext("2d");
         this.canvasHeight = this.myCanvas.height;
         this.canvasWidth = this.myCanvas.width;
-        this.reset();
+        this.reset(true);
         this.tick();
     };
     AppComponent.prototype.tick = function () {
@@ -40,51 +38,66 @@ var AppComponent = (function () {
             });
         }
         this.reset();
-        var currentRenderResolution = this.renderResolution;
-        for (var i = 0; i < this.canvasWidth; i += currentRenderResolution) {
-            for (var j = 0; j < this.canvasHeight; j += currentRenderResolution) {
-                var noise = this.noiseService.getPerlin(i * this.zoom / this.canvasHeight, j * this.zoom / this.canvasWidth, this.time);
-                var color = new color_1.Color(noise * 512, noise * 256, 0, 1);
-                this.context.fillStyle = color.toRGBA();
-                this.context.fillRect(i, j, currentRenderResolution, currentRenderResolution);
+        //draw water
+        if (this.hasWater) {
+            this.context.fillStyle = "azure";
+            this.context.fillRect(0, this.canvasHeight / 2, this.canvasWidth, this.canvasHeight / 2);
+        }
+        //iterate through objects
+        for (var i = 0; i < this.testObjects.length; i++) {
+            var objectForces = [];
+            //if object is currently under water - add water drag
+            if (this.hasWater && this.testObjects[i].position.y > this.canvasHeight / 2) {
+                var waterDragMagnitude = this.waterFriction * this.testObjects[i].velocity.mag() * this.testObjects[i].velocity.mag();
+                var waterDrag = this.testObjects[i].velocity.clone().mult(-1).normalize().mult(waterDragMagnitude);
+                objectForces.push(waterDrag);
             }
-        }
-        this.time += this.speed / 100;
-    };
-    AppComponent.prototype.changeZoom = function (value) {
-        this.zoom = +value;
-    };
-    AppComponent.prototype.changeResolution = function (value) {
-        this.renderResolution = +value;
-    };
-    AppComponent.prototype.changeSpeed = function (value) {
-        this.speed = +value;
-    };
-    AppComponent.prototype.toggleDrawing = function () {
-        this.isDrawing = !this.isDrawing;
-        if (this.isDrawing) {
-            this.tick();
+            else {
+                objectForces.push(this.wind);
+            }
+            //gravity applies every object
+            objectForces.push(this.gravity.clone().mult(this.testObjects[i].mass));
+            //ground friction applies only when on the ground
+            if (Math.round(this.testObjects[i].position.y + this.testObjects[i].radius) == this.testObjects[i].boundaries.y) {
+                var groundFriction = this.testObjects[i].velocity.clone().mult(-1).normalize().mult(this.groundFriction).mult(this.testObjects[i].mass);
+                groundFriction.y = 0;
+                objectForces.push(groundFriction);
+            }
+            this.testObjects[i].setForces(objectForces);
+            this.testObjects[i].update();
+            this.testObjects[i].draw(this.context);
         }
     };
-    AppComponent.prototype.reset = function (withRanges) {
-        if (withRanges === void 0) { withRanges = false; }
+    AppComponent.prototype.changeWind = function (value) {
+        this.wind.x = +value;
+    };
+    AppComponent.prototype.changeRestitution = function (value) {
+        this.restitution = +value;
+        for (var i = 0; i < this.testObjects.length; i++) {
+            this.testObjects[i].restitution = this.restitution;
+        }
+    };
+    AppComponent.prototype.toggleWater = function () {
+        this.hasWater = !this.hasWater;
+    };
+    AppComponent.prototype.reset = function (withObjects) {
+        if (withObjects === void 0) { withObjects = false; }
         this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-        this.walkerService.set(this.canvasWidth / 20, this.canvasHeight / 20);
-        if (withRanges) {
-            this.zoom = 25;
-            this.renderResolution = 25;
-            this.speed = 25;
+        if (withObjects) {
+            this.testObjects = [];
+            for (var i = 0; i < 10; i++) {
+                this.testObjects.push(new naturalObject_1.NaturalObject(new position_1.Vector2d(Math.random() * this.canvasWidth, Math.random() * this.canvasHeight), 0.5 + Math.random() * 2.5, this.restitution, new position_1.Vector2d(this.canvasWidth, this.canvasHeight)));
+            }
         }
     };
     AppComponent = __decorate([
         core_1.Component({
             selector: "my-app",
             templateUrl: "views/app.component.html",
-            providers: [walker_service_1.WalkerService, random_service_1.RandomService, noise_service_1.NoiseService]
+            providers: []
         }), 
-        __metadata('design:paramtypes', [walker_service_1.WalkerService, random_service_1.RandomService, noise_service_1.NoiseService])
+        __metadata('design:paramtypes', [])
     ], AppComponent);
     return AppComponent;
 }());
 exports.AppComponent = AppComponent;
-//# sourceMappingURL=app.component.js.map

@@ -1,14 +1,12 @@
 ﻿import {Component, AfterViewInit} from "@angular/core";
-import {IPosition, Position} from './position';
+import {ICoordinates, Vector2d} from './position';
+import {INaturalObject, NaturalObject} from './naturalObject';
 import {IColor, Color} from './color';
-import {WalkerService} from './walker.service';
-import {RandomService} from './random.service';
-import {NoiseService} from './noise.service';
 
 @Component({
     selector: "my-app",
     templateUrl: "views/app.component.html",
-    providers: [WalkerService, RandomService, NoiseService]
+    providers: []
 })
 export class AppComponent implements AfterViewInit {
     context: CanvasRenderingContext2D;
@@ -16,12 +14,23 @@ export class AppComponent implements AfterViewInit {
     canvasWidth: number;
     canvasHeight: number;
     isDrawing: boolean = true;
-    time = 0;
-    zoom = 25;
-    renderResolution = 25;
-    speed = 25;
+    testObjects: INaturalObject[];
+    wind: ICoordinates;
+    gravity: ICoordinates;
+    airFriction: number;
+    waterFriction: number;
+    groundFriction: number;
+    hasWater: boolean;
+    restitution: number;
 
-    constructor(private walkerService: WalkerService, private randomService: RandomService, private noiseService: NoiseService) {
+    constructor() {
+        this.wind = new Vector2d(0.02, 0);
+        this.gravity = new Vector2d(0, 1);
+        this.airFriction = .01;
+        this.waterFriction = .1;
+        this.groundFriction = .1;
+        this.restitution = .8;
+        this.hasWater = false;
     }
 
     ngAfterViewInit() {
@@ -29,7 +38,7 @@ export class AppComponent implements AfterViewInit {
         this.context = this.myCanvas.getContext("2d");
         this.canvasHeight = this.myCanvas.height;
         this.canvasWidth = this.myCanvas.width;
-        this.reset();
+        this.reset(true);
         this.tick();
     }
 
@@ -40,44 +49,67 @@ export class AppComponent implements AfterViewInit {
             });
         }
         this.reset();
-        var currentRenderResolution = this.renderResolution;
-        for (var i = 0; i < this.canvasWidth; i += currentRenderResolution) {
-            for (var j = 0; j < this.canvasHeight; j += currentRenderResolution) {
-                var noise = this.noiseService.getPerlin(i * this.zoom / this.canvasHeight, j * this.zoom / this.canvasWidth, this.time);
-                var color = new Color(noise * 512, noise * 256, 0, 1);
-                this.context.fillStyle = color.toRGBA();
-                this.context.fillRect(i, j, currentRenderResolution, currentRenderResolution);
+        //draw water
+        if (this.hasWater) {
+            this.context.fillStyle = "azure";
+            this.context.fillRect(0, this.canvasHeight / 2, this.canvasWidth, this.canvasHeight / 2);
+        }
+        //iterate through objects
+        for (var i = 0; i < this.testObjects.length; i++) {
+            var objectForces = [];
+            //if object is currently under water - add water drag
+            if (this.hasWater && this.testObjects[i].position.y > this.canvasHeight / 2) {
+                var waterDragMagnitude = this.waterFriction * this.testObjects[i].velocity.mag() * this.testObjects[i].velocity.mag();
+                var waterDrag = this.testObjects[i].velocity.clone().mult(-1).normalize().mult(waterDragMagnitude);
+                objectForces.push(waterDrag);
             }
-        }
-        this.time += this.speed/100;
-    }
-
-    changeZoom(value) {
-        this.zoom = +value;
-    }
-
-    changeResolution(value) {
-        this.renderResolution = +value;
-    }
-
-    changeSpeed(value) {
-        this.speed = +value;
-    }
-
-    toggleDrawing() {
-        this.isDrawing = !this.isDrawing;
-        if (this.isDrawing) {
-            this.tick();
+            //otherwise - add wind
+            else {
+                objectForces.push(this.wind);
+            }
+            //gravity applies every object
+            objectForces.push(this.gravity.clone().mult(this.testObjects[i].mass));
+            //ground friction applies only when on the ground
+            if (Math.round(this.testObjects[i].position.y + this.testObjects[i].radius) == this.testObjects[i].boundaries.y) {
+                var groundFriction = this.testObjects[i].velocity.clone().mult(-1).normalize().mult(this.groundFriction).mult(this.testObjects[i].mass);
+                groundFriction.y = 0;
+                objectForces.push(groundFriction);
+            }
+            this.testObjects[i].setForces(objectForces);
+            this.testObjects[i].update();
+            this.testObjects[i].draw(this.context);
         }
     }
 
-    reset(withRanges = false) {
+    changeWind(value) {
+        this.wind.x = +value;
+    }
+
+    changeRestitution(value) {
+        this.restitution = +value;
+        for (var i = 0; i < this.testObjects.length; i++) {
+            this.testObjects[i].restitution = this.restitution;
+        }
+    }
+
+    toggleWater() {
+        this.hasWater = !this.hasWater;
+    }
+
+    reset(withObjects = false) {
         this.context.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-        this.walkerService.set(this.canvasWidth / 20, this.canvasHeight / 20);
-        if (withRanges) {
-            this.zoom = 25;
-            this.renderResolution = 25;
-            this.speed = 25;
+        if (withObjects) {
+            this.testObjects = [];
+            for (var i = 0; i < 10; i++) {
+                this.testObjects.push(
+                    new NaturalObject(
+                        new Vector2d(Math.random() * this.canvasWidth, Math.random() * this.canvasHeight),
+                        0.5 + Math.random() * 2.5,
+                        this.restitution,
+                        new Vector2d(this.canvasWidth, this.canvasHeight)
+                    )
+                );
+            }
         }
     }
 }
